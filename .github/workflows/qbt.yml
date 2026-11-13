@@ -15,35 +15,35 @@ jobs:
 
     - name: vcpkg
       run: |
-        cd C:\vcpkg
+        cd C:/vcpkg
         git pull
-        .\bootstrap-vcpkg.bat
-        vcpkg install --vcpkg-root=C:\vcpkg zlib:x64-windows-static openssl:x64-windows-static qt5-base:x64-windows-static qt5-svg:x64-windows-static qt5-tools:x64-windows-static qt5-winextras:x64-windows-static --clean-after-build
+        ./bootstrap-vcpkg.bat
+        vcpkg install --vcpkg-root=C:/vcpkg zlib:x64-windows-static openssl:x64-windows-static qt5-base:x64-windows-static qt5-svg:x64-windows-static qt5-tools:x64-windows-static qt5-winextras:x64-windows-static --clean-after-build
 
     - name: boost
       run: |
         curl -s "https://archives.boost.io/release/1.86.0/source/boost_1_86_0.tar.gz" -o "boost_1_86_0.tar.gz"
-        tar -xzf boost_1_86_0.tar.gz -C C:\
+        tar -xzf boost_1_86_0.tar.gz -C C:/
 
     - name: Build libtorrent
       run: |
         git clone --recurse-submodules --branch v1.2.20 --depth 1 https://github.com/arvidn/libtorrent.git
         cd libtorrent
-        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DBoost_INCLUDE_DIR=C:\boost_1_86_0 -Wno-dev
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DBoost_INCLUDE_DIR=C:/boost_1_86_0 -Wno-dev
         cmake --build build
-        cmake --install build --prefix C:\libtorrent-install
+        cmake --install build --prefix C:/libtorrent-install
 
     - name: Build qBittorrent
       run: |
         git clone --branch release-4.6.7 --depth 1 https://github.com/qbittorrent/qBittorrent.git
         cd qBittorrent
         (Get-Content "src/base/CMakeLists.txt") -replace 'ZLIB::ZLIB', 'ZLIB::ZLIBSTATIC' | Set-Content "src/base/CMakeLists.txt"
-        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static -DMSVC_RUNTIME_DYNAMIC=OFF -DLibtorrentRasterbar_DIR=C:\libtorrent-install\lib\cmake\LibtorrentRasterbar\ -DBoost_INCLUDE_DIR=C:\boost_1_86_0 -Wno-dev
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static -DMSVC_RUNTIME_DYNAMIC=OFF -DLibtorrentRasterbar_DIR=C:/libtorrent-install/lib/cmake/LibtorrentRasterbar -DBoost_INCLUDE_DIR=C:/boost_1_86_0 -Wno-dev
         cmake --build build
-        cmake --install build --prefix C:\qbt --strip
+        cmake --install build --prefix C:/qbt --strip
 
     - name: Upload artifact
       uses: actions/upload-artifact@v7
       with:
         name: qbt
-        path: C:\qbt\qbittorrent.exe
+        path: C:/qbt/bin/qbittorrent.exe
